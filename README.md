@@ -33,3 +33,5 @@ The word list will instead be moved into a separate popup window, in which you c
 
 You can open the popup by clicking the "Streamer mode" button that is added to the top-right of every page on skribbl.io.  
 This popup will contain the list of words you can choose from when it's your turn to draw, as well as the current word while you're drawing.
+
+![Example of the extension in action](docs/example.png)
