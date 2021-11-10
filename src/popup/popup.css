@@ -1,0 +1,55 @@
+html {
+    overflow: hidden;
+}
+body {
+    /* for some reason the location bar in popups isn't removed from vh, so 100vh causes scroll */
+    min-height: 90vh;
+    background: url(https://skribbl.io/res/background.png);
+    background-size: 200px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+}
+body::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+
+.word {
+    min-width: 4em;
+    border: none;
+    border-radius: 2px;
+    background: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    margin: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.word:hover {
+    background: #eee;
+}
+
+.current-word {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+}
+
+.text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    opacity: 0.5;
+    text-align: center;
+}
