@@ -8,6 +8,8 @@ const elms = {
     $wordContainer: document.querySelector(".wordContainer"),
     $currentWord: document.getElementById("currentWord"),
     $drawingToolbar: document.querySelector(".containerToolbar"),
+    $chat: document.getElementById("boxMessages"),
+    $players: document.querySelector(".containerGame #containerGamePlayers"),
 };
 if (Object.keys(elms).some((k) => !elms[k])) {
     console.warn("Failed to get elements from DOM", elms);
@@ -29,7 +31,72 @@ class DOMWatcher {
         // attach our observer for the current word
         const curWordObserver = new MutationObserver(this.updateCurrentWord);
         curWordObserver.observe(elms.$currentWord, { childList: true });
+
+        // attach our observer for chat messages
+        const chatObserver = new MutationObserver(this.handleChatMessages);
+        chatObserver.observe(elms.$chat, { childList: true });
+
+        // attach our observer for player changes
+        const playerObserver = new MutationObserver(this.handlePlayers);
+        playerObserver.observe(elms.$players, { childList: true });
     }
+
+    handlePlayers = (/** @type {MutationRecord[]} */ records) => {
+        const interpretPlayer = (/** @type {HTMLElement} */ $elm) => {
+            const $name = $elm.querySelector(".name");
+            if (!$name) {
+                console.warn("Failed to find name for player elm", $elm);
+                return null;
+            }
+            const isUs = $name.style.color !== "";
+            let name = $name.textContent;
+            if (isUs) {
+                name = name.replace(/ \(You\)$/, "");
+            }
+            return {
+                name,
+                isUs,
+                $elm,
+            };
+        };
+        records.forEach((record) => {
+            const newPlayers = [...record.addedNodes].map(interpretPlayer);
+            const removedPlayers = [...record.removedNodes].map(
+                interpretPlayer
+            );
+
+            if (newPlayers.length) {
+                this.emit("players", newPlayers);
+            }
+            if (removedPlayers.length) {
+                this.emit("playersLeft", removedPlayers);
+            }
+        });
+    };
+
+    handleChatMessages = (/** @type {MutationRecord[]} */ records) => {
+        records.forEach((record) => {
+            const messages = [...record.addedNodes]
+                .map(($msg) => {
+                    if ($msg.childNodes.length !== 2) {
+                        return null;
+                    }
+                    return {
+                        sender: $msg.childNodes[0].textContent.replace(
+                            /: $/,
+                            ""
+                        ),
+                        message: $msg.childNodes[1].textContent,
+                        $elm: $msg,
+                    };
+                })
+                .filter((v) => v);
+
+            if (messages.length) {
+                this.emit("chat", messages);
+            }
+        });
+    };
 
     updateCurrentWord = (() => {
         let shouldIgnore = false; // set to true when we trigger an update ourselves, and we want to ignore it
@@ -79,6 +146,9 @@ class DOMWatcher {
      * Events currently supported and their callback type:
      *   "currentWord": (curWord: string) => {}
      *   "wordList": (wordList: string[]) => {}
+     *   "chat": (messages: {sender: string, message: string, $elm: Element}[]) => {}
+     *   "players": (players: {name: string, isUs: boolean, $elm: Element}[]) => {}
+     *   "playersLeft": (players: {...}[]) => {}
      */
     addListener(evt, callback) {
         if (!this.listeners[evt]) {
