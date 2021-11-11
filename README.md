@@ -1,7 +1,15 @@
 # skribbl.io-streamer-mode
 
-Super quick browser extension to add streamer mode to skribbl.io.  
-Works by hiding the word selection from the skribbl.io site, moving it into a separate popup window that you can hide from your stream.
+Super quick browser extension to add streamer mode to skribbl.io.
+
+### Features:
+
+<dl>
+  <dt>Anti-spoiling</dt>
+  <dd>Hide anything that would give away what you're currently drawing (word list when it's time to pick word, current word at top while drawing) so it doesn't show up on stream. It will instead be displayed in a separate popup.</dd>
+  <dt>Moderation</dt>
+  <dd>Hide chat messages and drawings of any player. Helps avoid trolls drawing edgy stuff or spamming chat.</dd>
+</dl>
 
 ## Installation
 
