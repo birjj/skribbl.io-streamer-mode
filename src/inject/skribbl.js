@@ -4,7 +4,6 @@
  */
 
 // add our listeners to the DOM watcher
-const domWatcher = new DOMWatcher();
 domWatcher.addListener("currentWord", (currentWord) => {
     chrome.runtime.sendMessage({
         type: "update",

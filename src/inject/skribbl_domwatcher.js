@@ -16,7 +16,17 @@ if (Object.keys(elms).some((k) => !elms[k])) {
     throw new Error("Couldn't find needed elements");
 }
 
-class DOMWatcher {
+/**
+ * A simple EventListener-like interface to DOM changes
+ * Events currently supported and their callback type:
+ *   "currentWord": (curWord: string) => {}
+ *   "wordList": (wordList: string[]) => {}
+ *   "chat": (messages: {sender: string, message: string, $elm: Element}[]) => {}
+ *   "players": (players: {name: string, isUs: boolean, $elm: Element}[]) => {}
+ *   "playersLeft": (players: {...}[]) => {}
+ *   "drawing": (player: {...} | null) => {}
+ */
+const domWatcher = new (class DOMWatcher {
     listeners = {};
 
     constructor() {
@@ -39,7 +49,39 @@ class DOMWatcher {
         // attach our observer for player changes
         const playerObserver = new MutationObserver(this.handlePlayers);
         playerObserver.observe(elms.$players, { childList: true });
+
+        // attach our observer for drawing changes
+        const drawingObserver = new MutationObserver(this.handleDrawing);
+        drawingObserver.observe(elms.$players, {
+            attributes: true,
+            subtree: true,
+        });
     }
+
+    handleDrawing = (/** @type {MutationRecord[]} */ records) => {
+        records.forEach((record) => {
+            // we get attribute updates for the entire subtree, but are only interested in the .drawing element
+            if (
+                !record.target.classList ||
+                !record.target.classList.contains("drawing")
+            ) {
+                return;
+            }
+
+            const isDrawing = record.target.style.display !== "none";
+
+            const $player = record.target.closest(".player");
+            if (!$player || !$player.skribblPlayerData) {
+                console.warn(
+                    "Unable to find player for drawing update",
+                    record.target
+                );
+                return;
+            }
+
+            this.emit("drawing", isDrawing ? $player.skribblPlayerData : null);
+        });
+    };
 
     handlePlayers = (/** @type {MutationRecord[]} */ records) => {
         const interpretPlayer = (/** @type {HTMLElement} */ $elm) => {
@@ -53,11 +95,12 @@ class DOMWatcher {
             if (isUs) {
                 name = name.replace(/ \(You\)$/, "");
             }
-            return {
+            $elm.skribblPlayerData = {
                 name,
                 isUs,
                 $elm,
             };
+            return $elm.skribblPlayerData;
         };
         records.forEach((record) => {
             const newPlayers = [...record.addedNodes].map(interpretPlayer);
@@ -143,12 +186,6 @@ class DOMWatcher {
 
     /**
      * Add a listener for a specific event
-     * Events currently supported and their callback type:
-     *   "currentWord": (curWord: string) => {}
-     *   "wordList": (wordList: string[]) => {}
-     *   "chat": (messages: {sender: string, message: string, $elm: Element}[]) => {}
-     *   "players": (players: {name: string, isUs: boolean, $elm: Element}[]) => {}
-     *   "playersLeft": (players: {...}[]) => {}
      */
     addListener(evt, callback) {
         if (!this.listeners[evt]) {
@@ -165,4 +202,4 @@ class DOMWatcher {
         }
         this.listeners[evt].forEach((cb) => cb(...data));
     }
-}
+})();
