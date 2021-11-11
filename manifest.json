@@ -16,7 +16,7 @@
     "content_scripts": [
         {
             "matches": ["https://skribbl.io/*"],
-            "js": ["src/inject/skribbl.js"],
+            "js": ["src/inject/skribbl_domwatcher.js", "src/inject/skribbl.js"],
             "css": ["src/inject/skribbl.css"],
             "run_at": "document_idle"
         }
