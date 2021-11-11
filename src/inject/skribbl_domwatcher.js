@@ -10,6 +10,7 @@ const elms = {
     $drawingToolbar: document.querySelector(".containerToolbar"),
     $chat: document.getElementById("boxMessages"),
     $players: document.querySelector(".containerGame #containerGamePlayers"),
+    $canvas: document.getElementById("canvasGame"),
 };
 if (Object.keys(elms).some((k) => !elms[k])) {
     console.warn("Failed to get elements from DOM", elms);
@@ -117,22 +118,21 @@ const domWatcher = new (class DOMWatcher {
         });
     };
 
+    parseChatElm = ($msg) => {
+        if ($msg.childNodes.length !== 2) {
+            return null;
+        }
+        return {
+            sender: $msg.childNodes[0].textContent.replace(/: $/, ""),
+            message: $msg.childNodes[1].textContent,
+            $elm: $msg,
+        };
+    };
+
     handleChatMessages = (/** @type {MutationRecord[]} */ records) => {
         records.forEach((record) => {
             const messages = [...record.addedNodes]
-                .map(($msg) => {
-                    if ($msg.childNodes.length !== 2) {
-                        return null;
-                    }
-                    return {
-                        sender: $msg.childNodes[0].textContent.replace(
-                            /: $/,
-                            ""
-                        ),
-                        message: $msg.childNodes[1].textContent,
-                        $elm: $msg,
-                    };
-                })
+                .map(this.parseChatElm)
                 .filter((v) => v);
 
             if (messages.length) {

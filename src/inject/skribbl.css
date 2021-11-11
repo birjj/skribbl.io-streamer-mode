@@ -24,3 +24,63 @@
 .streamer-mode__btn:hover {
     opacity: 1;
 }
+
+.streamer-mode__canvas-hider {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.streamer-mode__canvas-hider.active {
+    background: url(https://skribbl.io/res/background.png);
+}
+.streamer-mode__canvas-hider.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(255, 0, 0, 0.5);
+}
+
+.streamer-mode__moderation {
+    position: absolute;
+    right: 100%;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+.streamer-mode__moderation button {
+    background: #fff;
+    border: none;
+    flex-grow: 1;
+    border-radius: 0;
+    border-bottom: 1px solid #666;
+}
+.streamer-mode__moderation button:first-child {
+    border-radius: 5px 0 0 0;
+}
+.streamer-mode__moderation button:last-child {
+    border-radius: 0 0 0 5px;
+    border-bottom: none;
+}
+.streamer-mode__moderation button:hover {
+    background: #eee;
+}
+.streamer-mode__moderation button.active {
+    background: #ccc;
+}
+.streamer-mode__moderation button.active:hover {
+    background: #bbb;
+}
+.player.muted .message {
+    display: none !important;
+}
+.player.muted .name {
+    background: currentColor;
+}
