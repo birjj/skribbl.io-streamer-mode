@@ -1,3 +1,6 @@
+> **Warning**  
+> This extension is not updated for the newest skribbl.io update, and is currently non-functional.
+
 # skribbl.io-streamer-mode
 
 Super quick browser extension to add streamer mode to skribbl.io.
